@@ -1,0 +1,14 @@
+# Foundry build artifacts
+out/
+cache/
+broadcast/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Private keys and local credentials
+*.pem
+*.key
+secrets/
