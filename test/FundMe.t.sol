@@ -1,5 +1,4 @@
-
- // SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.35;
 
 import {Test} from "forge-std/Test.sol";
@@ -14,9 +13,7 @@ contract FundMeTest is Test {
 
     function setUp() public {
         priceFeed = new MockV3Aggregator(8, 2000e8);
-        fundMe = new FundMe(
-            AggregatorV3Interface(address(priceFeed))
-        );
+        fundMe = new FundMe(AggregatorV3Interface(address(priceFeed)));
     }
 
     function test_FundWithZeroETHReverts() public {
@@ -84,9 +81,9 @@ contract FundMeTest is Test {
 
         vm.expectRevert("Minimum $5 required");
         fundMe.fund{value: 0.001 ether}();
-   }
+    }
 
-   function test_FundExactlyMinimumSucceeds() public {
+    function test_FundExactlyMinimumSucceeds() public {
         vm.deal(address(this), 0.0025 ether);
 
         fundMe.fund{value: 0.0025 ether}();
@@ -99,11 +96,7 @@ contract FundMeTest is Test {
 
         fundMe.fund{value: 0.01 ether}();
 
-        assertEq(
-          fundMe.addressToAmountFunded(address(this)),
-          0.01 ether
-       );
-
+        assertEq(fundMe.addressToAmountFunded(address(this)), 0.01 ether);
     }
 
     function testOwnerCanWithdrawAndResetFunders() public {
@@ -129,7 +122,6 @@ contract FundMeTest is Test {
 
         fundMe.withdraw();
     }
-
 
     function testWithdrawResetsMultipleFunders() public {
         address funder1 = makeAddr("funder1");
@@ -159,15 +151,12 @@ contract FundMeTest is Test {
         assertEq(address(this).balance, ownerBalanceBefore + 2 ether);
     }
 
-
     function testWithdrawRevertsIfOwnerRejectsETH() public {
         // Create a contract that rejects incoming ETH.
         RejectingReceiver receiver = new RejectingReceiver();
 
         // The receiver deploys FundMe, so it becomes the owner.
-        FundMe rejectingFundMe = receiver.deployFundMe(
-           AggregatorV3Interface(address(priceFeed))
-        );
+        FundMe rejectingFundMe = receiver.deployFundMe(AggregatorV3Interface(address(priceFeed)));
 
         // Give this test contract ETH and fund the contract.
         vm.deal(address(this), 1 ether);
@@ -186,15 +175,10 @@ contract FundMeTest is Test {
         assertEq(rejectingFundMe.addressToAmountFunded(address(this)), 1 ether);
         assertEq(rejectingFundMe.getFunderCount(), 1);
     }
-
-
 }
 
-
 contract RejectingReceiver {
-    function deployFundMe(
-        AggregatorV3Interface priceFeed
-    ) external returns (FundMe) {
+    function deployFundMe(AggregatorV3Interface priceFeed) external returns (FundMe) {
         return new FundMe(priceFeed);
     }
 
